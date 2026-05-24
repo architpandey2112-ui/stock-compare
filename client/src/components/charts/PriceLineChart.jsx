@@ -6,8 +6,12 @@ export const CHART_COLORS = ['#3b82f6', '#a78bfa', '#34d399', '#fbbf24', '#f8717
 
 function normalize(history) {
   if (!history?.length) return [];
-  const base = history[0].close;
-  return history.map(h => ({ ...h, value: +((h.close / base) * 100).toFixed(3) }));
+  const first = history.find(h => h.close != null && h.close > 0);
+  if (!first) return [];
+  const base = first.close;
+  return history
+    .filter(h => h.close != null && h.close > 0)
+    .map(h => ({ ...h, value: +((h.close / base) * 100).toFixed(3) }));
 }
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -42,6 +46,14 @@ export default function PriceLineChart({ data }) {
   }
   const chartData = Object.values(dateMap).sort((a, b) => a.date.localeCompare(b.date));
 
+  if (chartData.length < 2) {
+    return (
+      <div className="flex items-center justify-center h-[280px] text-slate-500 text-sm">
+        Not enough data for this period — try a longer range
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: -10 }}>
@@ -75,6 +87,7 @@ export default function PriceLineChart({ data }) {
             stroke={CHART_COLORS[i % CHART_COLORS.length]}
             strokeWidth={2}
             dot={false}
+            connectNulls={true}
             activeDot={{ r: 4, strokeWidth: 0 }}
           />
         ))}

@@ -9,12 +9,25 @@ const router = Router();
 
 const PERIOD_DAYS = { '1w': 7, '1m': 30, '3m': 90, '6m': 180, '1y': 365, '3y': 1095, '5y': 1825 };
 
-async function buildSymbolData(symbol, period = '1y') {
-  const { quote, history: history5y } = await fetchSymbol(symbol, '5y');
+// Short periods need their own fetch — 5y monthly data has too few points inside 1w/1m/3m
+const SHORT_PERIODS = new Set(['1w', '1m', '3m']);
 
-  const days = PERIOD_DAYS[period] || 365;
-  const cutoff = Date.now() - days * 86400000;
-  const chartHistory = history5y.filter(h => new Date(h.date).getTime() >= cutoff);
+async function buildSymbolData(symbol, period = '1y') {
+  const needsChartFetch = SHORT_PERIODS.has(period);
+
+  const [{ quote, history: history5y }, chartResult] = await Promise.all([
+    fetchSymbol(symbol, '5y'),
+    needsChartFetch ? fetchSymbol(symbol, period) : Promise.resolve(null),
+  ]);
+
+  let chartHistory;
+  if (needsChartFetch && chartResult?.history?.length) {
+    chartHistory = chartResult.history;
+  } else {
+    const days = PERIOD_DAYS[period] || 365;
+    const cutoff = Date.now() - days * 86400000;
+    chartHistory = history5y.filter(h => new Date(h.date).getTime() >= cutoff);
+  }
 
   const vol = calcVolatility(history5y);
   const returns = calcAllReturns(history5y);
