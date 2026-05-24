@@ -46,9 +46,6 @@ export function Spinner({ text = 'Loading...' }) {
   );
 }
 
-export { Spinner as default };
-export { Spinner };
-
 function HomePage({ setTab }) {
   return (
     <div className="space-y-10">
