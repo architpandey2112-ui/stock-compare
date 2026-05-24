@@ -1,6 +1,21 @@
 import { NIFTY50, SENSEX30 } from './indiaStocks.js';
 
+// Safe long-term picks — low volatility, consistent performers
+const SAFE_LONGTERM = [
+  { symbol: 'VTI',  name: 'Vanguard Total Stock Market ETF', category: 'Safe Long-Term', note: 'Entire US market in one fund — 3,700+ stocks, 10%+ avg CAGR since 2001' },
+  { symbol: 'SCHD', name: 'Schwab US Dividend Equity ETF',   category: 'Safe Long-Term', note: 'Top 100 dividend stocks, lower volatility, strong total return with income' },
+  { symbol: 'BND',  name: 'Vanguard Total Bond Market ETF',  category: 'Safe Long-Term', note: 'Broad US bond exposure — capital preservation, low risk, steady income' },
+  { symbol: 'JNJ',  name: 'Johnson & Johnson',               category: 'Safe Long-Term', note: 'Healthcare giant, 60+ years of consecutive dividend increases, defensive stock' },
+  { symbol: 'PG',   name: 'Procter & Gamble',                category: 'Safe Long-Term', note: 'Consumer staples titan, pays dividends since 1890, nearly recession-proof' },
+  { symbol: 'KO',   name: 'Coca-Cola',                       category: 'Safe Long-Term', note: 'Warren Buffett\'s favourite — iconic brand, 60+ year dividend streak' },
+  { symbol: 'HDFCBANK.NS',   name: 'HDFC Bank',              category: 'Safe Long-Term', note: 'India\'s most consistent large private bank — best asset quality over 25 years' },
+  { symbol: 'HINDUNILVR.NS', name: 'Hindustan Unilever',     category: 'Safe Long-Term', note: 'India\'s largest FMCG company, consistent dividends, true defensive play' },
+  { symbol: 'ITC.NS',        name: 'ITC Ltd',                category: 'Safe Long-Term', note: 'High dividend yield, diversified business, low debt — classic income stock' },
+  { symbol: 'NESTLEIND.NS',  name: 'Nestle India',           category: 'Safe Long-Term', note: 'Premium FMCG, pricing power, parent Nestle SA backs quality and stability' },
+];
+
 export const CATEGORIES = {
+  'safe-longterm': SAFE_LONGTERM,
   'top-stocks': [
     { symbol: 'AAPL', name: 'Apple Inc.', category: 'Top Stock', note: 'Largest company by market cap, strong ecosystem & services revenue' },
     { symbol: 'MSFT', name: 'Microsoft Corp.', category: 'Top Stock', note: 'Cloud (Azure) + AI leader, consistent dividend grower' },
@@ -70,16 +85,23 @@ export const CATEGORIES = {
 
 export const ALL_SYMBOLS = [...new Set(Object.values(CATEGORIES).flat().map(s => s.symbol))];
 
+// Top picks from Nifty/Sensex used in the curated "all" pool
+const NIFTY_TOP = NIFTY50.slice(0, 15).map(s => ({ ...s, category: 'Nifty 50', note: `${s.sector} · NSE` }));
+const SENSEX_TOP = SENSEX30.slice(0, 10).map(s => ({ ...s, category: 'Sensex 30', note: `${s.sector} · BSE` }));
+
+// Full lists exported for when the user filters specifically by index
+export const NIFTY_UNIVERSE  = NIFTY50.map(s => ({ ...s, category: 'Nifty 50',  note: `${s.sector} · NSE` }));
+export const SENSEX_UNIVERSE = SENSEX30.map(s => ({ ...s, category: 'Sensex 30', note: `${s.sector} · BSE` }));
+
+// Curated pool for "all" — fast enough to score in one request
 export const RECOMMENDATION_UNIVERSE = [
+  ...CATEGORIES['safe-longterm'],
   ...CATEGORIES['top-stocks'],
   ...CATEGORIES['large-cap'],
-  ...CATEGORIES['mid-cap'],
-  ...CATEGORIES['small-cap'],
+  ...CATEGORIES['mid-cap'].slice(0, 2),
+  ...CATEGORIES['small-cap'].slice(0, 2),
   ...CATEGORIES['precious-metals'],
-  ...CATEGORIES['nifty50'],
-  ...CATEGORIES['sensex'],
   ...CATEGORIES['india-etf'],
-  ...CATEGORIES['india-large-cap-mf'],
-  ...CATEGORIES['india-mid-cap-mf'],
-  ...CATEGORIES['india-small-cap-mf'],
+  ...NIFTY_TOP,
+  ...SENSEX_TOP,
 ];

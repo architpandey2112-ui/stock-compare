@@ -3,7 +3,7 @@ import { fetchSymbol } from '../services/yahooFinance.js';
 import {
   calcReturn, calcVolatility, calcMaxDrawdown, calcSharpe, riskLevel
 } from '../services/calculator.js';
-import { RECOMMENDATION_UNIVERSE } from '../data/categories.js';
+import { RECOMMENDATION_UNIVERSE, NIFTY_UNIVERSE, SENSEX_UNIVERSE } from '../data/categories.js';
 
 const router = Router();
 
@@ -53,11 +53,13 @@ async function batchScore(universe, horizon, batchSize = 6) {
 router.get('/', async (req, res) => {
   const { horizon = 'long', risk = 'medium', returnType = 'high', category = 'all' } = req.query;
 
-  const universe = category === 'all'
-    ? RECOMMENDATION_UNIVERSE
-    : RECOMMENDATION_UNIVERSE.filter(s =>
-        s.category.toLowerCase() === category.toLowerCase()
-      );
+  const universe =
+    category === 'all'          ? RECOMMENDATION_UNIVERSE :
+    category === 'Nifty 50'     ? NIFTY_UNIVERSE :
+    category === 'Sensex 30'    ? SENSEX_UNIVERSE :
+    RECOMMENDATION_UNIVERSE.filter(s =>
+      s.category.toLowerCase() === category.toLowerCase()
+    );
 
   console.log(`[Recommendations] horizon=${horizon} risk=${risk} returnType=${returnType} category=${category} universe=${universe.length} symbols`);
   try {
