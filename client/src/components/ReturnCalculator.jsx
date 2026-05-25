@@ -15,10 +15,11 @@ const PRESETS = [
   { symbol: 'CUSTOM', name: 'Custom Rate', rate: 7.0, risk: 'Medium', color: '#64748b' },
 ];
 
-function fmt(n) {
-  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
-  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
-  return `$${n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+function fmt(n, sym = '$') {
+  if (n >= 1e9) return `${sym}${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e7) return `${sym}${(n / 1e7).toFixed(2)} Cr`;
+  if (n >= 1e6) return `${sym}${(n / 1e6).toFixed(2)}M`;
+  return `${sym}${n.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 }
 
 function computeGrowth(initial, monthly, years, annualRate) {
@@ -41,7 +42,7 @@ function computeGrowth(initial, monthly, years, annualRate) {
   return points;
 }
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, sym }) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-slate-900 border border-slate-600 rounded-xl p-3 shadow-2xl text-xs">
@@ -49,14 +50,14 @@ const CustomTooltip = ({ active, payload, label }) => {
       {payload.map((p, i) => (
         <div key={i} className="flex items-center justify-between gap-4">
           <span style={{ color: p.color }}>{p.name}</span>
-          <span className="font-semibold text-white">{fmt(p.value)}</span>
+          <span className="font-semibold text-white">{fmt(p.value, sym)}</span>
         </div>
       ))}
     </div>
   );
 };
 
-export default function ReturnCalculator({ compareData }) {
+export default function ReturnCalculator({ compareData, currency = 'USD' }) {
   const [initial, setInitial] = useState(10000);
   const [monthly, setMonthly] = useState(500);
   const [years, setYears] = useState(10);
@@ -64,6 +65,8 @@ export default function ReturnCalculator({ compareData }) {
   const [customRate, setCustomRate] = useState(7.0);
   const [compareMode, setCompareMode] = useState(false);
   const [compareSymbols, setCompareSymbols] = useState(['SPY', 'GLD']);
+
+  const sym = currency === 'INR' ? '₹' : '$';
 
   const preset = PRESETS.find(p => p.symbol === selectedPreset) || PRESETS[0];
   const rate = selectedPreset === 'CUSTOM' ? customRate : preset.rate;
@@ -160,13 +163,13 @@ export default function ReturnCalculator({ compareData }) {
             <h3 className="text-sm font-semibold text-slate-300">Investment Parameters</h3>
 
             {[
-              { label: 'Initial Investment ($)', value: initial, set: setInitial, min: 0, max: 10000000, step: 1000 },
-              { label: 'Monthly Contribution ($)', value: monthly, set: setMonthly, min: 0, max: 100000, step: 100 },
+              { label: `Initial Investment (${sym})`, value: initial, set: setInitial, min: 0, max: 10000000, step: 1000 },
+              { label: `Monthly Contribution (${sym})`, value: monthly, set: setMonthly, min: 0, max: 100000, step: 100 },
             ].map(({ label, value, set, min, max, step }) => (
               <div key={label}>
                 <div className="flex justify-between text-xs mb-1">
                   <label className="text-slate-400">{label}</label>
-                  <span className="text-white font-semibold">{fmt(value)}</span>
+                  <span className="text-white font-semibold">{fmt(value, sym)}</span>
                 </div>
                 <input
                   type="range" min={min} max={max} step={step} value={value}
@@ -203,9 +206,9 @@ export default function ReturnCalculator({ compareData }) {
           {/* Summary cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: 'Final Value', value: fmt(final.balance || 0), color: 'text-emerald-400 text-xl' },
-              { label: 'Total Invested', value: fmt(totalInvested), color: 'text-blue-400 text-xl' },
-              { label: 'Total Gains', value: fmt(Math.max(0, totalGains)), color: totalGains >= 0 ? 'text-emerald-400 text-xl' : 'text-red-400 text-xl' },
+              { label: 'Final Value', value: fmt(final.balance || 0, sym), color: 'text-emerald-400 text-xl' },
+              { label: 'Total Invested', value: fmt(totalInvested, sym), color: 'text-blue-400 text-xl' },
+              { label: 'Total Gains', value: fmt(Math.max(0, totalGains), sym), color: totalGains >= 0 ? 'text-emerald-400 text-xl' : 'text-red-400 text-xl' },
               { label: 'Total Return', value: `${totalReturn >= 0 ? '+' : ''}${totalReturn.toFixed(1)}%`, color: totalReturn >= 0 ? 'text-emerald-400 text-xl' : 'text-red-400 text-xl' },
             ].map(({ label, value, color }) => (
               <div key={label} className="bg-slate-800/80 rounded-xl border border-slate-700 p-4 text-center">
@@ -265,8 +268,8 @@ export default function ReturnCalculator({ compareData }) {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                   <XAxis dataKey="year" tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={v => `Yr ${v}`} />
-                  <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={v => fmt(v)} width={70} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={v => fmt(v, sym)} width={70} />
+                  <Tooltip content={<CustomTooltip sym={sym} />} />
                   <Area type="monotone" dataKey="invested" name="Amount Invested" stroke="#3b82f6" fill="url(#investGrad)" strokeWidth={2} />
                   <Area type="monotone" dataKey="balance" name="Total Value" stroke="#22c55e" fill="url(#gainGrad)" strokeWidth={2} />
                 </AreaChart>
@@ -276,8 +279,8 @@ export default function ReturnCalculator({ compareData }) {
                 <AreaChart data={compareChartData.merged} margin={{ top: 5, right: 5, bottom: 5, left: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                   <XAxis dataKey="year" tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={v => `Yr ${v}`} />
-                  <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={v => fmt(v)} width={70} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={v => fmt(v, sym)} width={70} />
+                  <Tooltip content={<CustomTooltip sym={sym} />} />
                   {compareChartData.sets.map(s => (
                     <Area key={s.symbol} type="monotone" dataKey={s.symbol} name={s.symbol}
                       stroke={s.color} fill={s.color} fillOpacity={0.05} strokeWidth={2} />
@@ -306,9 +309,9 @@ export default function ReturnCalculator({ compareData }) {
                     return (
                       <tr key={row.year} className="hover:bg-slate-700/20">
                         <td className="px-3 py-2 font-semibold text-slate-300">Yr {row.year}</td>
-                        <td className="px-3 py-2 text-slate-400">{fmt(row.invested)}</td>
-                        <td className="px-3 py-2 font-semibold text-white">{fmt(row.balance)}</td>
-                        <td className={`px-3 py-2 font-semibold ${gains >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{fmt(Math.abs(gains))}</td>
+                        <td className="px-3 py-2 text-slate-400">{fmt(row.invested, sym)}</td>
+                        <td className="px-3 py-2 font-semibold text-white">{fmt(row.balance, sym)}</td>
+                        <td className={`px-3 py-2 font-semibold ${gains >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{fmt(Math.abs(gains), sym)}</td>
                         <td className={`px-3 py-2 font-semibold ${ret >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{ret >= 0 ? '+' : ''}{ret.toFixed(1)}%</td>
                       </tr>
                     );

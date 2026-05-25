@@ -396,7 +396,7 @@ export default function App() {
             </div>
           )}
 
-          {tab === 'calculator' && <ReturnCalculator compareData={compareData} />}
+          {tab === 'calculator' && <ReturnCalculator compareData={compareData} currency={currency} />}
           {tab === 'insights'   && <InsightsPage />}
         </main>
       </div>
