@@ -288,6 +288,19 @@ export default function App() {
           </div>
         )}
 
+        {/* Currency bar */}
+        <div className="hidden lg:flex items-center justify-end px-6 py-2 border-b border-slate-800/60 bg-slate-900/80">
+          <span className="text-xs text-slate-500 mr-2">Display currency:</span>
+          <button
+            onClick={() => setCurrency(c => c === 'USD' ? 'INR' : 'USD')}
+            className="flex items-center gap-1.5 px-3 py-1 bg-slate-800 border border-slate-700 hover:border-blue-500 rounded-lg transition-all"
+          >
+            <span className={`text-xs font-bold ${currency === 'USD' ? 'text-blue-400' : 'text-slate-500'}`}>$ USD</span>
+            <span className="text-slate-600 text-xs">⇄</span>
+            <span className={`text-xs font-bold ${currency === 'INR' ? 'text-blue-400' : 'text-slate-500'}`}>₹ INR</span>
+          </button>
+        </div>
+
         <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 max-w-7xl mx-auto w-full">
 
           {tab === 'home'  && <HomePage setTab={setTab} />}

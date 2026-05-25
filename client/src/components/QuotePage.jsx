@@ -167,8 +167,14 @@ export default function QuotePage({ symbol, onAddToCompare, currency, usdToInr }
       {/* Chart */}
       {data.history?.length > 1 && (
         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5">
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">1Y Price History (Indexed to 100)</h3>
-          <PriceLineChart data={[data]} />
+          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
+            Share Price · 1Y · {data.currency === 'INR' ? '₹ INR' : '$ USD'}
+          </h3>
+          <PriceLineChart
+            data={[data]}
+            showRaw
+            currencySymbol={data.currency === 'INR' ? '₹' : '$'}
+          />
         </div>
       )}
     </div>
