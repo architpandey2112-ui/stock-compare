@@ -13,6 +13,8 @@ import GoldSilverPage from './components/GoldSilverPage';
 import ReturnCalculator from './components/ReturnCalculator';
 import IndiaIndexPage from './components/IndiaIndexPage';
 import InsightsPage from './components/InsightsPage';
+import SidebarSearch from './components/SidebarSearch';
+import QuotePage from './components/QuotePage';
 
 const PERIODS = ['1W', '1M', '3M', '6M', '1Y', '3Y', '5Y'];
 
@@ -138,9 +140,18 @@ export default function App() {
   const [recommendations, setRecommendations] = useState([]);
   const [recLoading, setRecLoading]     = useState(false);
   const [recError, setRecError]         = useState(null);
+  const [quoteSymbol, setQuoteSymbol]   = useState(null);
+  const [currency, setCurrency]         = useState('USD');
+  const [usdToInr, setUsdToInr]         = useState(84);
 
   useEffect(() => {
     axios.get('/api/health').then(() => setServerOk(true)).catch(() => setServerOk(false));
+  }, []);
+
+  useEffect(() => {
+    axios.get('/api/stocks/quote/USDINR=X')
+      .then(r => { if (r.data?.currentPrice) setUsdToInr(r.data.currentPrice); })
+      .catch(() => {});
   }, []);
 
   const fetchCompare = useCallback(async () => {
@@ -179,6 +190,12 @@ export default function App() {
   const removeSymbol = s => setSelected(p => p.filter(x => x !== s));
   const addAndCompare = s => { addSymbol(s); setTab('compare'); };
 
+  const handleQuoteSelect = (symbol) => {
+    setQuoteSymbol(symbol);
+    setTab('quote');
+    setSidebarOpen(false);
+  };
+
   const navigate = (id) => { setTab(id); setSidebarOpen(false); };
 
   return (
@@ -208,6 +225,11 @@ export default function App() {
             </div>
           </div>
 
+          {/* Sidebar search */}
+          <div className="px-3 py-3 border-b border-slate-800">
+            <SidebarSearch onSelect={handleQuoteSelect} />
+          </div>
+
           {/* Nav links */}
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
             {NAV.map(n => (
@@ -227,7 +249,19 @@ export default function App() {
           </nav>
 
           {/* Footer */}
-          <div className="px-5 py-4 border-t border-slate-800">
+          <div className="px-4 py-4 border-t border-slate-800 space-y-3">
+            {/* INR toggle */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500">Currency</span>
+              <button
+                onClick={() => setCurrency(c => c === 'USD' ? 'INR' : 'USD')}
+                className="flex items-center gap-1 bg-slate-800 border border-slate-700 hover:border-blue-500 rounded-lg px-2 py-1 transition-all"
+              >
+                <span className={`text-xs font-semibold transition-colors ${currency === 'USD' ? 'text-blue-400' : 'text-slate-500'}`}>$ USD</span>
+                <span className="text-slate-600 text-xs mx-0.5">⇄</span>
+                <span className={`text-xs font-semibold transition-colors ${currency === 'INR' ? 'text-blue-400' : 'text-slate-500'}`}>₹ INR</span>
+              </button>
+            </div>
             <p className="text-slate-600 text-xs">Data from Yahoo Finance</p>
             <p className="text-slate-700 text-xs">Not financial advice</p>
           </div>
@@ -256,12 +290,20 @@ export default function App() {
 
         <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 max-w-7xl mx-auto w-full">
 
-          {tab === 'home' && <HomePage setTab={setTab} />}
+          {tab === 'home'  && <HomePage setTab={setTab} />}
+          {tab === 'quote' && quoteSymbol && (
+            <QuotePage
+              symbol={quoteSymbol}
+              onAddToCompare={addAndCompare}
+              currency={currency}
+              usdToInr={usdToInr}
+            />
+          )}
 
           {tab === 'compare' && (
             <div className="space-y-5">
               <SearchBar onSelect={addSymbol} selected={selected} />
-              {selected.length > 0 && <StockChips symbols={selected} onRemove={removeSymbol} data={compareData} />}
+              {selected.length > 0 && <StockChips symbols={selected} onRemove={removeSymbol} data={compareData} currency={currency} usdToInr={usdToInr} />}
               {selected.length > 0 && (
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Period:</span>
@@ -295,7 +337,7 @@ export default function App() {
                   </div>
                   <div className="bg-slate-800/80 rounded-2xl p-5 border border-slate-700/60 overflow-hidden">
                     <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Detailed Metrics (click column to sort)</h3>
-                    <CompareTable data={compareData} onCalculate={() => setTab('calculator')} />
+                    <CompareTable data={compareData} onCalculate={() => setTab('calculator')} currency={currency} usdToInr={usdToInr} />
                   </div>
                 </div>
               )}

@@ -37,7 +37,14 @@ const SORT_KEYS = {
   cagr: d => d.cagr5y,
 };
 
-export default function CompareTable({ data }) {
+function convertPrice(price, stockCurrency, displayCurrency, rate) {
+  if (price == null || !rate) return price;
+  if (stockCurrency === 'USD' && displayCurrency === 'INR') return price * rate;
+  if (stockCurrency === 'INR' && displayCurrency === 'USD') return price / rate;
+  return price;
+}
+
+export default function CompareTable({ data, currency = 'USD', usdToInr }) {
   const [sortKey, setSortKey] = useState('1y');
   const [sortDir, setSortDir] = useState('desc');
 
@@ -93,7 +100,7 @@ export default function CompareTable({ data }) {
                 <div className="text-slate-500 text-xs truncate max-w-[140px]">{d.name}</div>
               </td>
               <td className="px-3 py-3 font-semibold text-white whitespace-nowrap">
-                {d.currency === 'INR' ? '₹' : '$'}{d.currentPrice?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {currency === 'INR' ? '₹' : '$'}{convertPrice(d.currentPrice, d.currency, currency, usdToInr)?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 {d.changePercent != null && (
                   <div className={`text-xs ${d.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                     {d.changePercent >= 0 ? '▲' : '▼'} {Math.abs(d.changePercent).toFixed(2)}%
@@ -133,7 +140,7 @@ export default function CompareTable({ data }) {
         <span>Sharpe &gt; 1 = good risk-adjusted return</span>
         <span>Volatility &lt; 12% = Low Risk</span>
         <span>5Y CAGR = Compound Annual Growth Rate over 5 years</span>
-        <span className="text-orange-700">Indian stocks (.NS) are priced in INR ₹</span>
+        <span className="text-orange-700">Prices shown in {currency === 'INR' ? 'INR ₹' : 'USD $'} · Toggle currency in the sidebar</span>
       </div>
     </div>
   );

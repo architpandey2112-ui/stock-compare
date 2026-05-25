@@ -1,6 +1,13 @@
 import { CHART_COLORS } from './charts/PriceLineChart';
 
-export default function StockChips({ symbols, onRemove, data }) {
+function convertPrice(price, stockCurrency, displayCurrency, rate) {
+  if (price == null || !rate) return price;
+  if (stockCurrency === 'USD' && displayCurrency === 'INR') return price * rate;
+  if (stockCurrency === 'INR' && displayCurrency === 'USD') return price / rate;
+  return price;
+}
+
+export default function StockChips({ symbols, onRemove, data, currency = 'USD', usdToInr }) {
   return (
     <div className="flex flex-wrap gap-2">
       {symbols.map((symbol, i) => {
@@ -19,7 +26,9 @@ export default function StockChips({ symbols, onRemove, data }) {
             />
             <span className="font-bold text-sm text-white">{symbol}</span>
             {d?.currentPrice && (
-              <span className="text-slate-300 text-sm">{d.currency === 'INR' ? '₹' : '$'}{d.currentPrice.toFixed(2)}</span>
+              <span className="text-slate-300 text-sm">
+                {currency === 'INR' ? '₹' : '$'}{convertPrice(d.currentPrice, d.currency, currency, usdToInr)?.toFixed(2)}
+              </span>
             )}
             {change != null && (
               <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${
