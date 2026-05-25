@@ -143,6 +143,7 @@ export default function App() {
   const [quoteSymbol, setQuoteSymbol]   = useState(null);
   const [currency, setCurrency]         = useState('USD');
   const [usdToInr, setUsdToInr]         = useState(84);
+  const [compareChartRaw, setCompareChartRaw] = useState(false);
 
   useEffect(() => {
     axios.get('/api/health').then(() => setServerOk(true)).catch(() => setServerOk(false));
@@ -336,8 +337,18 @@ export default function App() {
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                     <div className="bg-slate-800/80 rounded-2xl p-5 border border-slate-700/60">
-                      <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Price History (Indexed to 100)</h3>
-                      <PriceLineChart data={compareData} />
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                          {compareChartRaw ? 'Real Share Prices (native currency)' : 'Price History (Indexed to 100)'}
+                        </h3>
+                        <button
+                          onClick={() => setCompareChartRaw(r => !r)}
+                          className="text-xs px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-300 transition-all flex-shrink-0"
+                        >
+                          {compareChartRaw ? 'Indexed view' : 'Real prices'}
+                        </button>
+                      </div>
+                      <PriceLineChart data={compareData} showRaw={compareChartRaw} />
                     </div>
                     <div className="bg-slate-800/80 rounded-2xl p-5 border border-slate-700/60">
                       <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Returns by Period</h3>
