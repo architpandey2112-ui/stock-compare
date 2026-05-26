@@ -52,7 +52,9 @@ function FilterGroup({ label, options, value, onChange, multi = false }) {
   );
 }
 
-export default function FilterPanel({ filters, onChange, onApply }) {
+const INDIA_CATEGORIES = new Set(['Nifty 50', 'Sensex 30', 'India ETF']);
+
+export default function FilterPanel({ filters, onChange, onApply, indiaOnly = false }) {
   return (
     <div className="bg-slate-800/80 rounded-2xl border border-slate-700 p-5 space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -89,7 +91,9 @@ export default function FilterPanel({ filters, onChange, onApply }) {
         />
         <FilterGroup
           label="Asset Category"
-          options={FILTER_OPTIONS.category}
+          options={FILTER_OPTIONS.category.filter(o =>
+            !indiaOnly || o.value === 'all' || INDIA_CATEGORIES.has(o.value)
+          )}
           value={filters.category}
           onChange={v => onChange({ ...filters, category: v })}
         />

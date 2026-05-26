@@ -44,7 +44,7 @@ function searchLocal(q) {
   }));
 }
 
-export default function SearchBar({ onSelect, selected }) {
+export default function SearchBar({ onSelect, selected, indiaOnly = false }) {
   const [query, setQuery]       = useState('');
   const [apiResults, setApiResults] = useState([]);
   const [open, setOpen]         = useState(false);
@@ -114,7 +114,7 @@ export default function SearchBar({ onSelect, selected }) {
       {/* Quick picks */}
       {!query && selected.length < 5 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {POPULAR.filter(p => !isSelected(p.symbol)).map(p => (
+          {POPULAR.filter(p => !isSelected(p.symbol) && (!indiaOnly || p.tag === 'India' || p.tag === 'India ETF')).map(p => (
             <button
               key={p.symbol}
               onClick={() => pick(p.symbol)}

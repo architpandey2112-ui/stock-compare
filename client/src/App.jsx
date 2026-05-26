@@ -191,6 +191,13 @@ export default function App() {
 
   useEffect(() => { if (tab === 'recommend') fetchRecommendations(); }, [tab, fetchRecommendations]);
 
+  useEffect(() => {
+    setFilters(f => ({
+      ...f,
+      category: indiaOnly ? 'Nifty 50' : 'all',
+    }));
+  }, [indiaOnly]);
+
   const addSymbol    = s => { if (!selected.includes(s) && selected.length < 5) setSelected(p => [...p, s]); };
   const removeSymbol = s => setSelected(p => p.filter(x => x !== s));
   const addAndCompare = s => {
@@ -359,7 +366,7 @@ export default function App() {
 
           {tab === 'compare' && (
             <div className="space-y-5">
-              <SearchBar onSelect={addSymbol} selected={selected} />
+              <SearchBar onSelect={addSymbol} selected={selected} indiaOnly={indiaOnly} />
               {selected.length > 0 && <StockChips symbols={selected} onRemove={removeSymbol} data={compareData} currency={currency} usdToInr={usdToInr} />}
               {selected.length > 0 && (
                 <div className="flex items-center gap-2 flex-wrap">
@@ -414,9 +421,12 @@ export default function App() {
                   <p className="text-slate-300 text-lg font-medium mb-2">Compare any stocks, ETFs, or mutual funds</p>
                   <p className="text-slate-500 text-sm">Search above or browse popular categories below</p>
                   <div className="flex justify-center gap-3 mt-6 flex-wrap">
-                    {['GLD', 'SLV', 'AAPL', 'NVDA', 'SPY', 'QQQ'].map(s => (
+                    {(indiaOnly
+                      ? ['RELIANCE.NS', 'HDFCBANK.NS', 'TCS.NS', 'INFY.NS', 'ICICIBANK.NS', 'SBIN.NS']
+                      : ['GLD', 'SLV', 'AAPL', 'NVDA', 'SPY', 'QQQ']
+                    ).map(s => (
                       <button key={s} onClick={() => addSymbol(s)}
-                        className="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-300 hover:border-blue-500 hover:text-white transition-all">{s}</button>
+                        className="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-300 hover:border-blue-500 hover:text-white transition-all">{s.replace('.NS', '')}</button>
                     ))}
                   </div>
                 </div>
@@ -430,7 +440,7 @@ export default function App() {
 
           {tab === 'recommend' && (
             <div className="space-y-5">
-              <FilterPanel filters={filters} onChange={setFilters} onApply={fetchRecommendations} />
+              <FilterPanel filters={filters} onChange={setFilters} onApply={fetchRecommendations} indiaOnly={indiaOnly} />
               {recLoading && <Spinner text="Analysing investments… takes ~20–30 seconds" />}
               {!recLoading && recError && (
                 <div className="bg-red-900/30 border border-red-700 rounded-xl p-4 text-red-300 text-sm">⚠️ {recError}</div>
