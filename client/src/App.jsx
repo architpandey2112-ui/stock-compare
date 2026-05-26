@@ -282,7 +282,7 @@ export default function App() {
                   !indiaOnly ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
                 }`}
               >
-                🌍 Global
+                🌍 All
               </button>
             </div>
             {/* INR / USD toggle */}
@@ -423,7 +423,7 @@ export default function App() {
                   <div className="flex justify-center gap-3 mt-6 flex-wrap">
                     {(indiaOnly
                       ? ['RELIANCE.NS', 'HDFCBANK.NS', 'TCS.NS', 'INFY.NS', 'ICICIBANK.NS', 'SBIN.NS']
-                      : ['GLD', 'SLV', 'AAPL', 'NVDA', 'SPY', 'QQQ']
+                      : ['AAPL', 'NVDA', 'SPY', 'RELIANCE.NS', 'HDFCBANK.NS', 'GLD']
                     ).map(s => (
                       <button key={s} onClick={() => addSymbol(s)}
                         className="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-300 hover:border-blue-500 hover:text-white transition-all">{s.replace('.NS', '')}</button>
