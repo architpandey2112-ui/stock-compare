@@ -64,11 +64,14 @@ function SkeletonCard() {
   );
 }
 
-export default function CategoryBrowser({ onAddToCompare }) {
-  const [activeCat, setActiveCat] = useState('nifty50');
+export default function CategoryBrowser({ onAddToCompare, indiaOnly, setIndiaOnly }) {
+  const [activeCat, setActiveCat] = useState(indiaOnly ? 'nifty50' : 'top-stocks');
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
-  const [indiaOnly, setIndiaOnly] = useState(true);
+
+  useEffect(() => {
+    setActiveCat(indiaOnly ? 'nifty50' : 'top-stocks');
+  }, [indiaOnly]);
 
   useEffect(() => {
     if (data[activeCat]) return;
@@ -84,28 +87,6 @@ export default function CategoryBrowser({ onAddToCompare }) {
 
   return (
     <div className="space-y-5">
-      {/* India toggle */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => { setIndiaOnly(v => !v); setActiveCat(indiaOnly ? 'top-stocks' : 'nifty50'); }}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${
-            indiaOnly
-              ? 'bg-orange-600/20 border-orange-500 text-orange-300'
-              : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
-          }`}
-        >
-          🇮🇳 India Only
-        </button>
-        {indiaOnly && (
-          <button
-            onClick={() => { setIndiaOnly(false); setActiveCat('top-stocks'); }}
-            className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
-          >
-            Show all markets ↗
-          </button>
-        )}
-      </div>
-
       {/* Category tabs grouped */}
       <div className="space-y-3">
         {visibleGroups.map(group => (

@@ -144,6 +144,7 @@ export default function App() {
   const [recError, setRecError]         = useState(null);
   const [quoteSymbol, setQuoteSymbol]   = useState(null);
   const [currency, setCurrency]         = useState('INR');
+  const [indiaOnly, setIndiaOnly]       = useState(true);
   const [addedToast, setAddedToast]     = useState(null);
   const [usdToInr, setUsdToInr]         = useState(84);
   const [compareChartRaw, setCompareChartRaw] = useState(false);
@@ -256,20 +257,50 @@ export default function App() {
             ))}
           </nav>
 
-          {/* Footer */}
-          <div className="px-4 py-4 border-t border-slate-800 space-y-3">
-            {/* INR toggle */}
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500">Currency</span>
+          {/* Market + Currency toggles */}
+          <div className="px-3 py-3 border-t border-slate-800 space-y-2">
+            {/* India / Global toggle */}
+            <div className="flex rounded-xl overflow-hidden border border-slate-700">
               <button
-                onClick={() => setCurrency(c => c === 'USD' ? 'INR' : 'USD')}
-                className="flex items-center gap-1 bg-slate-800 border border-slate-700 hover:border-blue-500 rounded-lg px-2 py-1 transition-all"
+                onClick={() => setIndiaOnly(true)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold transition-all ${
+                  indiaOnly ? 'bg-orange-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
               >
-                <span className={`text-xs font-semibold transition-colors ${currency === 'USD' ? 'text-blue-400' : 'text-slate-500'}`}>$ USD</span>
-                <span className="text-slate-600 text-xs mx-0.5">⇄</span>
-                <span className={`text-xs font-semibold transition-colors ${currency === 'INR' ? 'text-blue-400' : 'text-slate-500'}`}>₹ INR</span>
+                🇮🇳 India
+              </button>
+              <button
+                onClick={() => setIndiaOnly(false)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold transition-all ${
+                  !indiaOnly ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                🌍 Global
               </button>
             </div>
+            {/* INR / USD toggle */}
+            <div className="flex rounded-xl overflow-hidden border border-slate-700">
+              <button
+                onClick={() => setCurrency('INR')}
+                className={`flex-1 py-2.5 text-xs font-semibold transition-all ${
+                  currency === 'INR' ? 'bg-orange-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                ₹ INR
+              </button>
+              <button
+                onClick={() => setCurrency('USD')}
+                className={`flex-1 py-2.5 text-xs font-semibold transition-all ${
+                  currency === 'USD' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                $ USD
+              </button>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="px-4 py-3 border-t border-slate-800">
             <p className="text-slate-600 text-xs">Data from Yahoo Finance</p>
             <p className="text-slate-700 text-xs">Not financial advice</p>
           </div>
@@ -393,7 +424,7 @@ export default function App() {
             </div>
           )}
 
-          {tab === 'categories' && <CategoryBrowser onAddToCompare={addAndCompare} />}
+          {tab === 'categories' && <CategoryBrowser onAddToCompare={addAndCompare} indiaOnly={indiaOnly} setIndiaOnly={setIndiaOnly} />}
           {tab === 'india'      && <IndiaIndexPage onAddToCompare={addAndCompare} />}
           {tab === 'metals'     && <GoldSilverPage onAddToCompare={addAndCompare} />}
 
