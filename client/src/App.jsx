@@ -15,6 +15,7 @@ import IndiaIndexPage from './components/IndiaIndexPage';
 import InsightsPage from './components/InsightsPage';
 import SidebarSearch from './components/SidebarSearch';
 import QuotePage from './components/QuotePage';
+import TrendingPage from './components/TrendingPage';
 
 const PERIODS = ['1W', '1M', '3M', '6M', '1Y', '3Y', '5Y'];
 
@@ -27,6 +28,7 @@ const NAV = [
   { id: 'recommend',  label: 'Recommendations', icon: '🎯' },
   { id: 'calculator', label: 'Calculator',      icon: '🧮' },
   { id: 'insights',   label: 'Insights',        icon: '💡' },
+  { id: 'trending',   label: 'Weekly Picks',    icon: '🔥' },
 ];
 
 const FEATURES = [
@@ -141,7 +143,8 @@ export default function App() {
   const [recLoading, setRecLoading]     = useState(false);
   const [recError, setRecError]         = useState(null);
   const [quoteSymbol, setQuoteSymbol]   = useState(null);
-  const [currency, setCurrency]         = useState('USD');
+  const [currency, setCurrency]         = useState('INR');
+  const [addedToast, setAddedToast]     = useState(null);
   const [usdToInr, setUsdToInr]         = useState(84);
   const [compareChartRaw, setCompareChartRaw] = useState(false);
 
@@ -189,7 +192,11 @@ export default function App() {
 
   const addSymbol    = s => { if (!selected.includes(s) && selected.length < 5) setSelected(p => [...p, s]); };
   const removeSymbol = s => setSelected(p => p.filter(x => x !== s));
-  const addAndCompare = s => { addSymbol(s); setTab('compare'); };
+  const addAndCompare = s => {
+    addSymbol(s);
+    setAddedToast(s);
+    setTimeout(() => setAddedToast(null), 2500);
+  };
 
   const handleQuoteSelect = (symbol) => {
     setQuoteSymbol(symbol);
@@ -286,6 +293,11 @@ export default function App() {
         {!serverOk && (
           <div className="bg-red-900/40 border-b border-red-700 px-6 py-2 text-center">
             <span className="text-red-300 text-sm">⚠️ Backend not running — start the server</span>
+          </div>
+        )}
+        {addedToast && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-700 text-white px-5 py-2.5 rounded-xl shadow-xl text-sm font-semibold pointer-events-none">
+            ✓ {addedToast} added to compare
           </div>
         )}
 
@@ -398,6 +410,7 @@ export default function App() {
 
           {tab === 'calculator' && <ReturnCalculator compareData={compareData} currency={currency} />}
           {tab === 'insights'   && <InsightsPage />}
+          {tab === 'trending'   && <TrendingPage onAddToCompare={addAndCompare} currency={currency} usdToInr={usdToInr} />}
         </main>
       </div>
     </div>

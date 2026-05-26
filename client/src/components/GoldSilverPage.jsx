@@ -261,7 +261,7 @@ function MetalCard({ metal, pros, cons, spikes, onAddToCompare, color, usdInr, i
       </div>
 
       {/* Tab selector */}
-      <div className="flex border-b border-slate-700/60">
+      <div className="flex border-b border-slate-700/60 overflow-x-auto scrollbar-none">
         {[
           { id: 'overview', label: 'Overview & Chart' },
           { id: 'invest', label: '✓ Reasons to Invest' },
