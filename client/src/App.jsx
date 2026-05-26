@@ -192,10 +192,23 @@ export default function App() {
   useEffect(() => { if (tab === 'recommend') fetchRecommendations(); }, [tab, fetchRecommendations]);
 
   useEffect(() => {
-    setFilters(f => ({
-      ...f,
-      category: indiaOnly ? 'Nifty 50' : 'all',
-    }));
+    const newCategory = indiaOnly ? 'Nifty 50' : 'all';
+    setFilters(f => {
+      const updated = { ...f, category: newCategory };
+      if (tab === 'recommend') {
+        setRecLoading(true);
+        setRecError(null);
+        axios.get('/api/recommendations', { params: updated, timeout: 120000 })
+          .then(({ data }) => {
+            if (!data.length) setRecError('No results matched your filters. Try loosening the risk or category filter.');
+            setRecommendations(data);
+          })
+          .catch(() => setRecError('Failed to load recommendations. Make sure the server is running.'))
+          .finally(() => setRecLoading(false));
+      }
+      return updated;
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [indiaOnly]);
 
   const addSymbol    = s => { if (!selected.includes(s) && selected.length < 5) setSelected(p => [...p, s]); };
