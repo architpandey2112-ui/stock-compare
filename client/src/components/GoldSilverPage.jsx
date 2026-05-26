@@ -41,20 +41,71 @@ const SILVER_CONS = [
 ];
 
 const GOLD_SPIKE_DRIVERS = [
-  { period: 'Mar 2020', driver: 'COVID-19 crash, then massive Fed stimulus → gold hit $2,000 for first time', direction: 'up' },
-  { period: 'Aug 2020', driver: 'Peak COVID fear + near-zero real rates → all-time high ~$2,070', direction: 'up' },
-  { period: 'Feb–Mar 2022', driver: 'Russia–Ukraine war, geopolitical safe-haven demand', direction: 'up' },
-  { period: 'Oct 2023', driver: 'Israel–Hamas conflict, Middle East escalation risk', direction: 'up' },
-  { period: 'Mar 2024', driver: 'Rate cut expectations + China central bank buying surge', direction: 'up' },
-  { period: 'Oct 2024–2025', driver: 'Election uncertainty + Fed cuts + de-dollarization trend → $3,000+ milestone', direction: 'up' },
+  {
+    period: 'Mar 2020', direction: 'down',
+    driver: 'COVID crash pulled gold to ~$1,477/oz (−12%) as markets liquidated all assets for cash — then sharp recovery on Fed\'s $2T stimulus package',
+    note: 'Gold did NOT hit $2,000 in March 2020. That milestone came in August 2020.',
+    source: 'World Gold Council · FXCM Markets',
+  },
+  {
+    period: 'Aug 2020', direction: 'up',
+    driver: 'Gold crossed $2,000 for the first time (Aug 4) and hit ATH of $2,075/oz (Aug 6) — deeply negative real rates, USD weakness, COVID uncertainty',
+    source: 'World Gold Council · GoldPrice.org',
+  },
+  {
+    period: 'Feb–Mar 2022', direction: 'up',
+    driver: 'Russia invaded Ukraine (Feb 24); gold spiked from ~$1,900 to $2,051/oz by Mar 8 on safe-haven demand; LBMA suspended Russian gold bar accreditation',
+    source: 'World Gold Council Q1 2022 · ABN AMRO Research',
+  },
+  {
+    period: 'Oct 2023', direction: 'up',
+    driver: 'Hamas attacked Israel (Oct 7); gold rallied 7.3% during October, crossing $2,050/oz — Middle East risk premium and central bank buying (800+ tonnes in 9 months)',
+    source: 'ING Think · BullionVault',
+  },
+  {
+    period: 'Mar–Apr 2024', direction: 'up',
+    driver: 'Gold broke new ATH above $2,200–$2,400; PBoC bought gold for 17+ consecutive months; rate-cut pricing and dollar weakness supported the rally',
+    source: 'World Gold Council · J.P. Morgan Global Research',
+  },
+  {
+    period: 'Sep 2024–Mar 2025', direction: 'up',
+    driver: 'Fed began cutting rates (Sep 18, 2024 — first cut since 2020); gold up 26%+ in full-year 2024; hit $3,000/oz milestone in March 2025; central banks buying 1,000+ tonnes/yr',
+    source: 'World Gold Council · IG Bank Switzerland',
+  },
 ];
 
 const SILVER_SPIKE_DRIVERS = [
-  { period: 'Jan 2021', driver: 'Reddit WallStreetBets short squeeze attempt — sharp spike then reversal', direction: 'up' },
-  { period: 'Mar 2022', driver: 'Russia sanctions, commodity super-cycle fears', direction: 'up' },
-  { period: 'May 2024', driver: 'Solar demand surge, gold rally spillover, short covering', direction: 'up' },
-  { period: 'Oct 2024', driver: 'AI/EV demand narrative for industrial metals, gold correlation', direction: 'up' },
-  { period: 'Dec 2023', driver: 'Rate cut hopes weakened — silver fell with gold, industrial demand concerns', direction: 'down' },
+  {
+    period: 'Jan–Feb 2021', direction: 'up',
+    driver: 'Reddit r/WallStreetBets "Silver Squeeze" — silver briefly hit ~$30/oz (Feb 1); SLV ETF absorbed ~$1B in one session; CME raised margin requirements; price quickly retreated to $26',
+    source: 'CNBC · Bloomberg · Fortune',
+  },
+  {
+    period: 'Mar 2022', direction: 'up',
+    driver: 'Russia–Ukraine war; LBMA banned newly-cast Russian silver bars; commodity supply shock fears — silver rose from ~$24 to ~$27/oz',
+    source: 'Reuters · Silver Institute · OilPrice.com',
+  },
+  {
+    period: 'Sep–Oct 2023', direction: 'down',
+    driver: 'Dollar strengthened as Fed pushed back rate-cut expectations; silver fell from ~$25 to ~$21/oz — industrial demand concerns compounded the move',
+    note: 'This was the actual weak period, not December 2023. Silver recovered into Dec 2023 after the Fed\'s dovish pivot.',
+    source: 'Silver Institute · SunSirs Commodity Data',
+  },
+  {
+    period: 'May 2024', direction: 'up',
+    driver: 'Silver hit 11-year high of $32.52/oz (May 20); driven by 4th consecutive year of supply deficit (215M+ oz), solar cell transition to higher-silver N-type panels, and short covering',
+    source: 'Silver Institute 2024 · Reuters',
+  },
+  {
+    period: 'Oct 2024', direction: 'up',
+    driver: 'Record industrial silver demand of 680M oz in 2024 (solar = 16%, EVs = 2.9%); AI data-centre infrastructure demand; gold/silver correlation as gold surged',
+    source: 'BlackRock · CME Group · FX Empire',
+  },
+  {
+    period: 'Nov 2025', direction: 'up',
+    driver: 'Silver hit historic peak of ~$57/oz — up 90% year-on-year. Driven by London vault depletion, record India physical demand, AI/EV industrial buying, and strong gold correlation as gold surpassed $4,000',
+    source: 'CNBC (Nov 29 2025) · CME Group OpenMarkets 2026',
+  },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -78,13 +129,26 @@ function ProCon({ items, isPositive }) {
 
 function SpikeTimeline({ spikes }) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {spikes.map((s, i) => (
         <div key={i} className="flex items-start gap-3">
-          <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${s.direction === 'up' ? 'bg-emerald-400' : 'bg-red-400'}`} />
-          <div>
-            <span className="text-xs font-semibold text-slate-300">{s.period}</span>
-            <span className="text-xs text-slate-500 ml-2">{s.driver}</span>
+          <div className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${s.direction === 'up' ? 'bg-emerald-400' : 'bg-red-400'}`} />
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-semibold text-slate-300">{s.period}</span>
+              <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${s.direction === 'up' ? 'bg-emerald-900/40 text-emerald-400' : 'bg-red-900/40 text-red-400'}`}>
+                {s.direction === 'up' ? '▲ Up' : '▼ Down'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{s.driver}</p>
+            {s.note && (
+              <p className="text-xs text-amber-400/80 mt-1 bg-amber-900/10 border border-amber-800/30 rounded px-2 py-1">
+                ⚠️ {s.note}
+              </p>
+            )}
+            {s.source && (
+              <p className="text-xs text-slate-600 mt-1">Source: {s.source}</p>
+            )}
           </div>
         </div>
       ))}
