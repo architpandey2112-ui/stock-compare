@@ -7,6 +7,7 @@ import stocksRouter from './routes/stocks.js';
 import recommendationsRouter from './routes/recommendations.js';
 import metalsRouter from './routes/metals.js';
 import indiaRouter from './routes/india.js';
+import aiRouter from './routes/ai.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -19,6 +20,7 @@ app.use('/api/stocks', stocksRouter);
 app.use('/api/recommendations', recommendationsRouter);
 app.use('/api/metals', metalsRouter);
 app.use('/api/india', indiaRouter);
+app.use('/api/ai', aiRouter);
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 app.get('/api/test', async (req, res) => {

@@ -16,6 +16,7 @@ import InsightsPage from './components/InsightsPage';
 import SidebarSearch from './components/SidebarSearch';
 import QuotePage from './components/QuotePage';
 import TrendingPage from './components/TrendingPage';
+import AIChatButton from './components/AIChatButton';
 
 const PERIODS = ['1W', '1M', '3M', '6M', '1Y', '3Y', '5Y'];
 
@@ -467,6 +468,8 @@ export default function App() {
           {tab === 'trending'   && <TrendingPage onAddToCompare={addAndCompare} currency={currency} usdToInr={usdToInr} />}
         </main>
       </div>
+
+      <AIChatButton stocks={compareData} />
     </div>
   );
 }
