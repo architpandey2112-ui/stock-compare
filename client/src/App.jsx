@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import SearchBar from './components/SearchBar';
 import StockChips from './components/StockChips';
@@ -132,6 +132,7 @@ function HomePage({ setTab }) {
 
 export default function App() {
   const [tab, setTab]                   = useState('home');
+  const tabRef = useRef('home');
   const [sidebarOpen, setSidebarOpen]   = useState(false);
   const [selected, setSelected]         = useState([]);
   const [period, setPeriod]             = useState('1Y');
@@ -149,6 +150,8 @@ export default function App() {
   const [addedToast, setAddedToast]     = useState(null);
   const [usdToInr, setUsdToInr]         = useState(84);
   const [compareChartRaw, setCompareChartRaw] = useState(false);
+
+  useEffect(() => { tabRef.current = tab; }, [tab]);
 
   useEffect(() => {
     axios.get('/api/health').then(() => setServerOk(true)).catch(() => setServerOk(false));
@@ -196,7 +199,7 @@ export default function App() {
     const newCategory = indiaOnly ? 'Nifty 50' : 'all';
     setFilters(f => {
       const updated = { ...f, category: newCategory };
-      if (tab === 'recommend') {
+      if (tabRef.current === 'recommend') {
         setRecLoading(true);
         setRecError(null);
         axios.get('/api/recommendations', { params: updated, timeout: 120000 })
@@ -209,7 +212,6 @@ export default function App() {
       }
       return updated;
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [indiaOnly]);
 
   const addSymbol    = s => { if (!selected.includes(s) && selected.length < 5) setSelected(p => [...p, s]); };
