@@ -466,7 +466,7 @@ export default function App() {
 
           {tab === 'calculator' && <ReturnCalculator compareData={compareData} currency={currency} />}
           {tab === 'insights'   && <InsightsPage />}
-          {tab === 'trending'   && <TrendingPage onAddToCompare={addAndCompare} currency={currency} usdToInr={usdToInr} />}
+          {tab === 'trending'   && <TrendingPage onAddToCompare={addAndCompare} currency={currency} usdToInr={usdToInr} indiaOnly={indiaOnly} />}
         </main>
       </div>
 

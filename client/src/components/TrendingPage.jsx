@@ -194,8 +194,7 @@ function SectorCard({ sector, stockData, onAddToCompare, currency, usdToInr }) {
   );
 }
 
-export default function TrendingPage({ onAddToCompare, currency = 'INR', usdToInr = 84 }) {
-  const [indiaOnly, setIndiaOnly] = useState(true);
+export default function TrendingPage({ onAddToCompare, currency = 'INR', usdToInr = 84, indiaOnly = true }) {
   const [stockData, setStockData] = useState({});
   const [loading, setLoading]     = useState(false);
   const [fetched, setFetched]     = useState({ india: false, global: false });
@@ -239,16 +238,9 @@ export default function TrendingPage({ onAddToCompare, currency = 'INR', usdToIn
           <h2 className="text-xl font-bold text-white mb-1">Weekly Sector Picks</h2>
           <p className="text-slate-400 text-sm">Live returns by sector · sorted by best 1W performance · tap + to compare</p>
         </div>
-        <div className="flex items-center bg-slate-800 border border-slate-700 rounded-xl p-1 gap-1">
-          <button onClick={() => setIndiaOnly(true)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${indiaOnly ? 'bg-orange-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}>
-            🇮🇳 India
-          </button>
-          <button onClick={() => setIndiaOnly(false)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${!indiaOnly ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}>
-            🌍 Global
-          </button>
-        </div>
+        <span className={`text-xs px-3 py-1.5 rounded-xl border font-semibold ${indiaOnly ? 'bg-orange-900/30 border-orange-700 text-orange-300' : 'bg-blue-900/30 border-blue-700 text-blue-300'}`}>
+          {indiaOnly ? '🇮🇳 India' : '🌍 All Markets'}
+        </span>
       </div>
 
       {loading
