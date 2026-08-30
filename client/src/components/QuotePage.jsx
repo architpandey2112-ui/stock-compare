@@ -47,7 +47,7 @@ function Ret({ label, v }) {
   );
 }
 
-export default function QuotePage({ symbol, onAddToCompare, currency, usdToInr }) {
+export default function QuotePage({ symbol, onAddToCompare, currency, usdToInr, favorites = [], onToggleFavorite }) {
   const [data, setData]     = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState(null);
@@ -108,13 +108,25 @@ export default function QuotePage({ symbol, onAddToCompare, currency, usdToInr }
         </div>
       </div>
 
-      {/* Action */}
-      <button
-        onClick={() => onAddToCompare(data.symbol)}
-        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-semibold transition-all shadow-lg shadow-blue-900/20"
-      >
-        + Add to Compare
-      </button>
+      {/* Actions */}
+      <div className="flex gap-2 flex-wrap">
+        <button
+          onClick={() => onAddToCompare(data.symbol)}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-semibold transition-all shadow-lg shadow-blue-900/20"
+        >
+          + Add to Compare
+        </button>
+        <button
+          onClick={() => onToggleFavorite?.(data.symbol)}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
+            favorites.includes(data.symbol)
+              ? 'bg-yellow-600/20 border-yellow-600/50 text-yellow-400'
+              : 'bg-slate-800 border-slate-600 text-slate-400 hover:border-yellow-500 hover:text-yellow-400'
+          }`}
+        >
+          {favorites.includes(data.symbol) ? '★ Favorited' : '☆ Favorite'}
+        </button>
+      </div>
 
       {/* Key stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

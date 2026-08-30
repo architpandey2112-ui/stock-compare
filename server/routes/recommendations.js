@@ -9,7 +9,7 @@ const router = Router();
 
 async function scoreSymbol({ symbol, name, category, note }, horizon) {
   try {
-    const { history } = await fetchSymbol(symbol, '1y');
+    const { history } = await fetchSymbol(symbol, '1y', '1d');
     if (!history || history.length < 10) return null;
 
     const vol = calcVolatility(history);

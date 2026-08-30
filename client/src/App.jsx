@@ -17,6 +17,7 @@ import SidebarSearch from './components/SidebarSearch';
 import QuotePage from './components/QuotePage';
 import TrendingPage from './components/TrendingPage';
 import AIChatButton from './components/AIChatButton';
+import FavoritesBar from './components/FavoritesBar';
 
 const PERIODS = ['1W', '1M', '3M', '6M', '1Y', '3Y', '5Y'];
 
@@ -150,6 +151,17 @@ export default function App() {
   const [addedToast, setAddedToast]     = useState(null);
   const [usdToInr, setUsdToInr]         = useState(84);
   const [compareChartRaw, setCompareChartRaw] = useState(false);
+  const [favorites, setFavorites] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('stockFavorites') || '[]'); } catch { return []; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('stockFavorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (symbol) => setFavorites(f =>
+    f.includes(symbol) ? f.filter(x => x !== symbol) : [...f, symbol]
+  );
 
   useEffect(() => { tabRef.current = tab; }, [tab]);
 
@@ -376,13 +388,16 @@ export default function App() {
               onAddToCompare={addAndCompare}
               currency={currency}
               usdToInr={usdToInr}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
             />
           )}
 
           {tab === 'compare' && (
             <div className="space-y-5">
               <SearchBar onSelect={addSymbol} selected={selected} indiaOnly={indiaOnly} />
-              {selected.length > 0 && <StockChips symbols={selected} onRemove={removeSymbol} data={compareData} currency={currency} usdToInr={usdToInr} />}
+              <FavoritesBar favorites={favorites} onAdd={addSymbol} onUnfavorite={toggleFavorite} selected={selected} />
+              {selected.length > 0 && <StockChips symbols={selected} onRemove={removeSymbol} data={compareData} currency={currency} usdToInr={usdToInr} favorites={favorites} onToggleFavorite={toggleFavorite} />}
               {selected.length > 0 && (
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Period:</span>

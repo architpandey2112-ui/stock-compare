@@ -15,8 +15,9 @@ const SHORT_PERIODS = new Set(['1w', '1m', '3m']);
 async function buildSymbolData(symbol, period = '1y') {
   const needsChartFetch = SHORT_PERIODS.has(period);
 
-  const [{ quote, history: history5y }, chartResult] = await Promise.all([
+  const [{ quote, history: history5y }, { history: history1d }, chartResult] = await Promise.all([
     fetchSymbol(symbol, '5y'),
+    fetchSymbol(symbol, '1y', '1d'),
     needsChartFetch ? fetchSymbol(symbol, period) : Promise.resolve(null),
   ]);
 
@@ -26,11 +27,23 @@ async function buildSymbolData(symbol, period = '1y') {
   } else {
     const days = PERIOD_DAYS[period] || 365;
     const cutoff = Date.now() - days * 86400000;
-    chartHistory = history5y.filter(h => new Date(h.date).getTime() >= cutoff);
+    chartHistory = history1d.length
+      ? history1d.filter(h => new Date(h.date).getTime() >= cutoff)
+      : history5y.filter(h => new Date(h.date).getTime() >= cutoff);
   }
 
-  const vol = calcVolatility(history5y);
-  const returns = calcAllReturns(history5y);
+  // Use daily 1y data for short-term returns and risk metrics (accurate)
+  // Use 5y monthly only for 3y/5y returns and CAGR
+  const daily = history1d.length ? history1d : history5y;
+  const vol = calcVolatility(daily);
+  const returns = {
+    '1m': calcReturn(daily, 30),
+    '3m': calcReturn(daily, 90),
+    '6m': calcReturn(daily, 180),
+    '1y': calcReturn(daily, 365),
+    '3y': calcReturn(history5y, 1095),
+    '5y': calcReturn(history5y, 1825),
+  };
   const cagr5y = calcCAGR(history5y, 5);
 
   return {

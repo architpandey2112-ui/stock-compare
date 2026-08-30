@@ -47,9 +47,9 @@ async function yhGet(path) {
 }
 
 // Single call — returns both quote info and price history
-export async function fetchSymbol(symbol, period = '1y') {
+export async function fetchSymbol(symbol, period = '1y', forceInterval = null) {
   const range    = RANGES[period]    || '1y';
-  const interval = INTERVALS[period] || '1wk';
+  const interval = forceInterval || INTERVALS[period] || '1wk';
 
   const data = await yhGet(
     `/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}&includePrePost=false`

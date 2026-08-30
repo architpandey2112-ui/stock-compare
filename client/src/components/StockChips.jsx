@@ -7,7 +7,7 @@ function convertPrice(price, stockCurrency, displayCurrency, rate) {
   return price;
 }
 
-export default function StockChips({ symbols, onRemove, data, currency = 'USD', usdToInr }) {
+export default function StockChips({ symbols, onRemove, data, currency = 'USD', usdToInr, favorites = [], onToggleFavorite }) {
   return (
     <div className="flex flex-wrap gap-2">
       {symbols.map((symbol, i) => {
@@ -37,6 +37,13 @@ export default function StockChips({ symbols, onRemove, data, currency = 'USD', 
                 {pos ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
               </span>
             )}
+            <button
+              onClick={() => onToggleFavorite?.(symbol)}
+              className={`text-base transition-colors leading-none ${favorites.includes(symbol) ? 'text-yellow-400' : 'text-slate-600 hover:text-yellow-400'}`}
+              title={favorites.includes(symbol) ? 'Unfavorite' : 'Add to favorites'}
+            >
+              ★
+            </button>
             <button
               onClick={() => onRemove(symbol)}
               className="text-slate-600 hover:text-red-400 transition-colors text-sm ml-0.5 leading-none"

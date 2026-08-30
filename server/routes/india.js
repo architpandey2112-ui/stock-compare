@@ -7,7 +7,7 @@ const router = Router();
 
 async function fetchStockData({ symbol, name, sector }) {
   try {
-    const { quote, history } = await fetchSymbol(symbol, '1y');
+    const { quote, history } = await fetchSymbol(symbol, '1y', '1d');
     const vol = calcVolatility(history);
     return {
       symbol, name, sector,
